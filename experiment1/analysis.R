@@ -29,14 +29,13 @@ ggplot(d.summary, aes(x=variable, y=proportion, fill=value)) +
 
 
 ## test for differences
-m <- brm(bf(value ~ cs(variable*vignette)), d, family=sratio(),
+m <- brm(bf(value ~ cs(variable*vignette)), d, family=sratio,
          prior=set_prior('normal(0, 1)', class='b'), cores=4)
 summary(m, prior=TRUE)
 
 ## assuming no category-specific effects
 ##m <- brm(bf(value ~ variable*vignette), d, family=cumulative,
 ##         prior=set_prior('normal(0, 10)', class='b'), cores=4)
-
 
 draws.prob <- d %>%
     distinct(vignette, variable) %>%
@@ -47,6 +46,7 @@ draws.prob <- d %>%
 ggplot(draws.prob, aes(x=variable)) +
     geom_col(aes(y=proportion, fill=value), position='dodge', data=d.summary) +
     stat_pointinterval(aes(y=.epred, group=.category), position='dodge') +
+    geom_hline(yintercept=0.3, linetype='dashed') +
     facet_wrap(~ vignette) +
     theme_classic()
 ggsave('experiment1.png', width=6, height=4)
